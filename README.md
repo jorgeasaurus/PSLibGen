@@ -2,6 +2,12 @@
 
 A PowerShell module for searching and downloading books from Library Genesis. This is a PowerShell implementation inspired by [libgen-api-modern](https://github.com/johnnie-610/libgen-api-modern).
 
+## 📚 Quick Start
+
+New to PSLibGen? Check out the [Quick Start Guide](QUICKSTART.md) to get up and running in minutes!
+
+> **Note**: This PowerShell module provides the same core functionality as [libgen-api-modern](https://github.com/johnnie-610/libgen-api-modern) but with a PowerShell-native API. See [IMPLEMENTATION.md](IMPLEMENTATION.md) for technical details.
+
 ## Features
 
 - 🔍 **Search LibGen**: Search for books with simple cmdlets

@@ -24,43 +24,38 @@ function Resolve-LibGenMirrorLink {
         [string]$BaseUrl
     )
 
+    # Ensure mirror partial starts with /
+    if (-not $MirrorPartial.StartsWith('/')) {
+        $MirrorPartial = '/' + $MirrorPartial
+    }
+    
+    $url = $BaseUrl + $MirrorPartial
+    
+    Write-Verbose "Resolving mirror link: $url"
+    
     try {
-        # Ensure mirror partial starts with /
-        if (-not $MirrorPartial.StartsWith('/')) {
-            $MirrorPartial = '/' + $MirrorPartial
-        }
+        $response = Invoke-WebRequest -Uri $url -TimeoutSec 10 -UseBasicParsing
+        $html = $response.Content
         
-        $url = $BaseUrl + $MirrorPartial
-        
-        Write-Verbose "Resolving mirror link: $url"
-        
-        try {
-            $response = Invoke-WebRequest -Uri $url -TimeoutSec 10 -UseBasicParsing
-            $html = $response.Content
+        # Look for get.php?md5= link
+        if ($html -match 'href="(get\.php\?md5=[^"]+)"') {
+            $getLink = $matches[1]
             
-            # Look for get.php?md5= link
-            if ($html -match 'href="(get\.php\?md5=[^"]+)"') {
-                $getLink = $matches[1]
-                
-                if (-not $getLink.StartsWith('/')) {
-                    $getLink = '/' + $getLink
-                }
-                
-                $resolvedUrl = $BaseUrl + $getLink
-                Write-Verbose "Resolved to: $resolvedUrl"
-                return $resolvedUrl
+            if (-not $getLink.StartsWith('/')) {
+                $getLink = '/' + $getLink
             }
-            else {
-                Write-Warning "Could not find get.php link in mirror page: $url"
-                return $url
-            }
+            
+            $resolvedUrl = $BaseUrl + $getLink
+            Write-Verbose "Resolved to: $resolvedUrl"
+            return $resolvedUrl
         }
-        catch {
-            Write-Warning "Error resolving mirror link $url : $($_.Exception.Message)"
+        else {
+            Write-Warning "Could not find get.php link in mirror page: $url"
             return $url
         }
     }
     catch {
-        throw [LibGenNetworkException]::new("Failed to resolve mirror link: $($_.Exception.Message)")
+        Write-Warning "Error resolving mirror link $url : $($_.Exception.Message)"
+        return $url
     }
 }

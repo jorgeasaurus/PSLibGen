@@ -91,7 +91,7 @@ function Search-LibGen {
                 
                 if ($rawResults.Count -eq 0) {
                     Write-Verbose "No results found at $baseUrl"
-                    return @()
+                    continue
                 }
                 
                 Write-Verbose "Found $($rawResults.Count) results at $baseUrl"

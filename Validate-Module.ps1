@@ -83,6 +83,9 @@ foreach ($param in $expectedParams) {
 }
 if ($hasAllParams) {
     Write-Host "✓ All required parameters present" -ForegroundColor Green
+} else {
+    Write-Host "✗ One or more required parameters are missing for Save-LibGenBook" -ForegroundColor Red
+    exit 1
 }
 
 # Test 6: Run Pester tests

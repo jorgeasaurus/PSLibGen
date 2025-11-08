@@ -1,0 +1,44 @@
+# PowerShell
+*.ps1xml
+*.dll
+*.exe
+*.so
+*.dylib
+
+# Test results
+TestResults/
+*.trx
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Downloads from examples
+*.pdf
+*.epub
+*.mobi
+*.djvu
+
+# CSV exports
+*.csv
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+~$*

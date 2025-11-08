@@ -14,7 +14,7 @@ function Parse-LibGenSearchResults {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]$Html
     )
 

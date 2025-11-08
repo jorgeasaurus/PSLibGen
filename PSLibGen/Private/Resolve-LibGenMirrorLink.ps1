@@ -17,10 +17,10 @@ function Resolve-LibGenMirrorLink {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]$MirrorPartial,
         
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]$BaseUrl
     )
 

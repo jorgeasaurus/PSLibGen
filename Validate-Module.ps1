@@ -67,6 +67,8 @@ foreach ($param in $expectedParams) {
 }
 if ($hasAllParams) {
     Write-Host "✓ All required parameters present" -ForegroundColor Green
+} else {
+    exit 1
 }
 
 Write-Host "`n[Test 5] Checking Save-LibGenBook parameters..." -ForegroundColor Yellow

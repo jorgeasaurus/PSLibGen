@@ -55,10 +55,10 @@ function Save-LibGenBook {
         Write-Host "Downloading to: $OutputPath" -ForegroundColor Cyan
         
         # Download with progress
+        $originalProgressPreference = $ProgressPreference
         try {
             $ProgressPreference = 'SilentlyContinue'
             Invoke-WebRequest -Uri $Url -OutFile $OutputPath -TimeoutSec 300
-            $ProgressPreference = 'Continue'
             
             Write-Host "Download complete: '$OutputPath'" -ForegroundColor Green
             
@@ -69,6 +69,9 @@ function Save-LibGenBook {
             throw [LibGenNetworkException]::new(
                 "Download failed: $($_.Exception.Message)"
             )
+        }
+        finally {
+            $ProgressPreference = $originalProgressPreference
         }
     }
     catch {

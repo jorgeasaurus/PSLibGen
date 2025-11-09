@@ -30,11 +30,16 @@ function Resolve-LibGenMirrorLink {
     }
     
     $url = $BaseUrl + $MirrorPartial
-    
+
     Write-Verbose "Resolving mirror link: $url"
-    
+
+    # Headers to mimic a browser request
+    $headers = @{
+        "User-Agent" = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+
     try {
-        $response = Invoke-WebRequest -Uri $url -TimeoutSec 10 -UseBasicParsing
+        $response = Invoke-WebRequest -Uri $url -Headers $headers -TimeoutSec 10 -UseBasicParsing
         $html = $response.Content
         
         # Look for get.php?md5= link

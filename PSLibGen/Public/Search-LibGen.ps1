@@ -43,14 +43,20 @@ function Search-LibGen {
     )
 
     begin {
-        # LibGen mirror URLs to try
+        # LibGen mirror URLs to try (ordered by reliability)
         $libgenUrls = @(
-            'https://libgen.gl',
-            'https://libgen.gs',
             'https://libgen.vg',
+            'https://libgen.bz',
+            'https://libgen.plus',
+            'https://libgen.gs',
             'https://libgen.la',
-            'https://libgen.bz'
+            'https://libgen.ac'
         )
+
+        # Headers to mimic a browser request
+        $headers = @{
+            "User-Agent" = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
     }
 
     process {
@@ -70,13 +76,13 @@ function Search-LibGen {
             
             try {
                 # Build query string
-                $queryString = ($searchParams.GetEnumerator() | ForEach-Object { 
-                    "$($_.Key)=$([System.Uri]::EscapeDataString($_.Value))" 
+                $queryString = ($searchParams.GetEnumerator() | ForEach-Object {
+                    "$($_.Key)=$([System.Uri]::EscapeDataString($_.Value))"
                 }) -join '&'
-                
-                $fullUrl = "$searchUrl?$queryString"
-                
-                $response = Invoke-WebRequest -Uri $fullUrl -TimeoutSec 15 -UseBasicParsing -ErrorAction Stop
+
+                $fullUrl = $searchUrl + "?" + $queryString
+
+                $response = Invoke-WebRequest -Uri $fullUrl -Headers $headers -TimeoutSec 15 -UseBasicParsing -ErrorAction Stop
                 
                 if ($response.StatusCode -ne 200) {
                     throw [LibGenNetworkException]::new(
@@ -95,14 +101,17 @@ function Search-LibGen {
                 }
                 
                 Write-Verbose "Found $($rawResults.Count) results at $baseUrl"
-                
+
                 # Process each result
+                # Note: Parallel processing with ForEach-Object -Parallel is not used here because
+                # PowerShell classes (BookData, DownloadLinks) are not available in parallel runspaces
+                # without complex serialization. Sequential processing is fast enough for typical use.
                 foreach ($result in $rawResults) {
                     # Fix cover URL if relative
                     if ($result.Cover -and -not $result.Cover.StartsWith('http')) {
                         $result.Cover = $baseUrl + $result.Cover
                     }
-                    
+
                     # Resolve mirror link
                     $downloadLink = $null
                     if ($result.Mirror -and -not $NoResolveLinks) {
@@ -120,7 +129,7 @@ function Search-LibGen {
                             $downloadLink = Resolve-LibGenMirrorLink -MirrorPartial $result.Mirror -BaseUrl $baseUrl
                         }
                     }
-                    
+
                     # Create DownloadLinks object
                     $downloadLinksObj = $null
                     if ($downloadLink) {
@@ -132,13 +141,13 @@ function Search-LibGen {
                             $result.Cover
                         )
                     }
-                    
+
                     # Parse authors
                     $authors = @()
                     if ($result.Authors) {
                         $authors = $result.Authors -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
                     }
-                    
+
                     # Create BookData object
                     $bookData = [BookData]::new(
                         '', # ID not available from search
@@ -154,7 +163,7 @@ function Search-LibGen {
                         $result.Cover,
                         $downloadLinksObj
                     )
-                    
+
                     $bookResults += $bookData
                 }
                 

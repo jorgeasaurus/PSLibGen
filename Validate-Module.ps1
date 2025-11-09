@@ -48,8 +48,7 @@ try {
         Write-Host "✗ Class properties not set correctly" -ForegroundColor Red
         exit 1
     }
-}
-catch {
+} catch {
     Write-Host "✗ Error testing classes: $($_.Exception.Message)" -ForegroundColor Red
     exit 1
 }

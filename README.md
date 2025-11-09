@@ -227,12 +227,15 @@ catch [LibGenNetworkException] {
 
 ## Mirror Sites
 
-The module automatically tries multiple LibGen mirror sites for reliability:
-- libgen.gl
+The module automatically tries multiple LibGen mirror sites for reliability (ordered by current availability):
+- libgen.vg (primary)
+- libgen.bz (primary)
+- libgen.plus
 - libgen.gs
-- libgen.vg
 - libgen.la
-- libgen.bz
+- libgen.ac
+
+**Note:** Mirror availability changes over time. The module will automatically try alternative mirrors if the primary ones are unavailable.
 
 ## Legal Notice
 

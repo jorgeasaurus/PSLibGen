@@ -53,11 +53,16 @@ function Save-LibGenBook {
         
         Write-Verbose "Starting download from: $Url"
         Write-Host "Downloading to: $OutputPath" -ForegroundColor Cyan
-        
+
+        # Headers to mimic a browser request
+        $headers = @{
+            "User-Agent" = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+
         # Download with progress
         try {
             $ProgressPreference = 'SilentlyContinue'
-            Invoke-WebRequest -Uri $Url -OutFile $OutputPath -TimeoutSec 300
+            Invoke-WebRequest -Uri $Url -Headers $headers -OutFile $OutputPath -TimeoutSec 300
             $ProgressPreference = 'Continue'
             
             Write-Host "Download complete: '$OutputPath'" -ForegroundColor Green

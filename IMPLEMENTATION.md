@@ -85,12 +85,18 @@ Features:
 - `Results`: Maximum results to return (default: 100)
 - `NoResolveLinks`: Skip mirror link resolution
 
-**Mirror Sites:**
-- libgen.gl
+**Mirror Sites (ordered by reliability):**
+- libgen.vg (primary)
+- libgen.bz (primary)
+- libgen.plus
 - libgen.gs
-- libgen.vg
 - libgen.la
-- libgen.bz
+- libgen.ac
+
+**Technical Notes:**
+- All HTTP requests include User-Agent headers to avoid 403 Forbidden errors
+- URL construction uses explicit concatenation to avoid variable scope issues
+- Automatic fallback to alternative mirrors on failure
 
 ### 6. Download Cmdlet (Public/Save-LibGenBook.ps1)
 
@@ -234,11 +240,13 @@ Contribution guidelines including:
 
 ## Notes
 
-- LibGen sites may change or become unavailable; mirror list should be maintained
-- HTML parsing is brittle and may break if LibGen changes their HTML structure
-- Network timeouts are set conservatively (10-15 seconds)
-- No authentication required for LibGen access
-- Module requires PowerShell 5.1 or higher
+- **User-Agent headers are required** - All HTTP requests must include browser-like User-Agent headers to avoid 403 Forbidden errors from LibGen sites
+- **Mirror availability** - LibGen sites may change or become unavailable; mirror list should be maintained and is ordered by current reliability (libgen.vg and libgen.bz are primary as of testing)
+- **HTML parsing brittleness** - HTML parsing is brittle and may break if LibGen changes their HTML structure
+- **Network timeouts** - Set conservatively (10-15 seconds) for reliability
+- **No authentication** - No authentication required for LibGen access
+- **PowerShell version** - Module requires PowerShell 5.1 or higher
+- **URL construction** - Use explicit string concatenation instead of interpolation to avoid variable scope issues
 
 ## License
 

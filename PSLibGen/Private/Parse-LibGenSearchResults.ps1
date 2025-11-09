@@ -20,7 +20,7 @@ function Parse-LibGenSearchResults {
 
     try {
         $results = @()
-        
+
         # Find the table with id="tablelibgen"
         if ($Html -match '(?s)<table[^>]*id="tablelibgen"[^>]*>(.*?)</table>') {
             $tableContent = $matches[1]
@@ -55,17 +55,51 @@ function Parse-LibGenSearchResults {
                     $mirrorLink = $matches[1]
                 }
                 
+                # Helper function to extract title from the title cell
+                function Extract-Title {
+                    param([string]$CellHtml)
+
+                    # The title cell starts with <b>title text followed by <a> tags and other metadata
+                    # The <b> tag may not have a proper closing tag, so we match until the next <
+                    if ($CellHtml -match '<b>([^<]+)') {
+                        $title = $matches[1]
+                        $title = [System.Web.HttpUtility]::HtmlDecode($title)
+                        $title = $title.Trim()
+                        return $title
+                    }
+
+                    # Fallback: try <a> tag
+                    if ($CellHtml -match '<a[^>]*>([^<]+)</a>') {
+                        $title = $matches[1]
+                        $title = [System.Web.HttpUtility]::HtmlDecode($title)
+                        $title = $title.Trim()
+                        return $title
+                    }
+
+                    # Last resort: use Clean-Text
+                    return Clean-Text $CellHtml
+                }
+
                 # Helper function to strip HTML tags and clean text
                 function Clean-Text {
                     param([string]$Text)
-                    $cleaned = $Text -replace '<[^>]+>', ''
-                    $cleaned = [System.Web.HttpUtility]::HtmlDecode($cleaned)
-                    return $cleaned.Trim()
+                    # Remove all HTML tags (handles nested tags)
+                    while ($Text -match '<[^>]+>') {
+                        $Text = $Text -replace '<[^>]+>', ' '
+                    }
+                    # Decode HTML entities
+                    $Text = [System.Web.HttpUtility]::HtmlDecode($Text)
+                    # Clean up multiple spaces and trim
+                    $Text = $Text -replace '\s+', ' '
+                    $Text = $Text.Trim()
+                    # Remove common artifacts
+                    $Text = $Text -replace '^\s*\d+\s*$', ''  # Remove lone numbers
+                    return $Text
                 }
                 
                 $result = @{
                     Cover     = $coverUrl
-                    Title     = Clean-Text $cells[1]
+                    Title     = Extract-Title $cells[1]
                     Authors   = Clean-Text $cells[2]
                     Publisher = Clean-Text $cells[3]
                     Year      = Clean-Text $cells[4]
